@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+
 lib64/
 parts/
 sdist/
@@ -125,7 +125,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+
 .venv
 env/
 venv/
@@ -165,3 +165,30 @@ cython_debug/
 #.idea/
 
 backup_config/
+
+# Project Specific
+.env
+database.db
+database.db.backup
+storage/
+downloads/
+server/venv/
+web/node_modules/
+web/dist/
+.DS_Store
+
+# Temporary Scripts
+check_*.py
+test_*.py
+explore_*.py
+migrate_database.py
+demo.py
+ffmpeg_install.py
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
