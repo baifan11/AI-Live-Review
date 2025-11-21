@@ -177,8 +177,8 @@ npm run dev
 ### 系统设置
 
 在 **Settings** 页面配置：
-- **DashScope API Key**: 阿里云 AI 服务密钥
-
+- **DashScope API Key**: 阿里云 AI 服务密钥(暂时不生效，APIkey配置在.env文件里)
+- **提示词**
 ---
 
 ## 📁 项目结构
@@ -221,7 +221,7 @@ AI-Live-Review/
 # 阿里云 DashScope API Key（必需，用于 AI 分析）
 DASHSCOPE_API_KEY=your_dashscope_api_key
 
-# 前端 API 地址（可选，默认 http://localhost:8000）
+# 前端 API 地址（可选，默认 http://localhost:5173）
 VITE_API_URL=http://localhost:8000
 ```
 
