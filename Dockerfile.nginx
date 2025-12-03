@@ -1,0 +1,40 @@
+# ================================
+# Nginx Dockerfile (包含前端构建)
+# ================================
+
+# -------------------- 阶段 1: 构建前端 --------------------
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/web
+
+# 使用淘宝 npm 镜像加速
+RUN npm config set registry https://registry.npmmirror.com
+
+# 复制前端依赖文件
+COPY web/package*.json ./
+
+# 安装依赖
+RUN npm install
+
+# 复制前端源码
+COPY web/ ./
+
+# 构建前端生产版本
+RUN npm run build
+
+# -------------------- 阶段 2: Nginx 运行环境 --------------------
+FROM nginx:alpine
+
+# 复制 Nginx 配置文件
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# 从前端构建阶段复制构建产物到 Nginx 目录
+COPY --from=frontend-builder /app/web/dist /usr/share/nginx/html
+
+# 创建存储目录挂载点
+RUN mkdir -p /var/www/storage && chmod 755 /var/www/storage
+
+# 暴露端口
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

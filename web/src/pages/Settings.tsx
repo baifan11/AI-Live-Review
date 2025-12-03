@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSetting, updateSetting, getSettingsBatch, updateSettingsBatch } from '../lib/api';
+import { updateSetting, getSettingsBatch, updateSettingsBatch } from '../lib/api';
 import { Save } from 'lucide-react';
 
 const Settings: React.FC = () => {
@@ -149,7 +149,7 @@ const Settings: React.FC = () => {
                         </label>
                         <textarea
                             value={prompts.prompt_transcript}
-                            onChange={(e) => setPrompts({...prompts, prompt_transcript: e.target.value})}
+                            onChange={(e) => setPrompts({ ...prompts, prompt_transcript: e.target.value })}
                             rows={4}
                             className="w-full p-3 border rounded-md text-sm font-mono resize-y"
                             placeholder={defaultPrompts.prompt_transcript}
@@ -163,7 +163,7 @@ const Settings: React.FC = () => {
                         </label>
                         <textarea
                             value={prompts.prompt_vision}
-                            onChange={(e) => setPrompts({...prompts, prompt_vision: e.target.value})}
+                            onChange={(e) => setPrompts({ ...prompts, prompt_vision: e.target.value })}
                             rows={3}
                             className="w-full p-3 border rounded-md text-sm font-mono resize-y"
                             placeholder={defaultPrompts.prompt_vision}
@@ -177,7 +177,7 @@ const Settings: React.FC = () => {
                         </label>
                         <textarea
                             value={prompts.prompt_summary}
-                            onChange={(e) => setPrompts({...prompts, prompt_summary: e.target.value})}
+                            onChange={(e) => setPrompts({ ...prompts, prompt_summary: e.target.value })}
                             rows={8}
                             className="w-full p-3 border rounded-md text-sm font-mono resize-y"
                             placeholder={defaultPrompts.prompt_summary}

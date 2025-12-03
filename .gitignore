@@ -192,3 +192,10 @@ logs/
 # IDE
 .idea/
 .vscode/
+.claude/
+
+# Docker
+docker-compose.override.yml
+.docker/
+*.tar
+*.tar.gz

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: '/api',
 });
 
 export interface Task {
@@ -96,12 +96,12 @@ export const updateSetting = async (key: string, value: string) => {
     return response.data;
 }
 
-export const getSettingsBatch = async (keys: string[]): Promise<Record<string, string | null>> => {
+export const getSettingsBatch = async (keys: string[]): Promise<{ [key: string]: string | null }> => {
     const response = await api.get(`/settings-batch/?keys=${keys.join(',')}`);
     return response.data;
 }
 
-export const updateSettingsBatch = async (settings: Record<string, string>) => {
+export const updateSettingsBatch = async (settings: { [key: string]: string }) => {
     const response = await api.post('/settings-batch/', settings);
     return response.data;
 }

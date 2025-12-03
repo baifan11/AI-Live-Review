@@ -1,6 +1,73 @@
-.github/workflows/build-image.yml
+# Git 相关
 .git
+.github
 .gitignore
 .dockerignore
+
+# 文档
 README.md
 LICENSE
+*.md
+IMPROVEMENTS.md
+TROUBLESHOOTING.md
+UPGRADE_SUMMARY.md
+system_design.md
+task.md
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 虚拟环境
+venv/
+.venv/
+env/
+ENV/
+server/venv/
+
+# Node.js
+node_modules/
+web/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 前端构建缓存
+web/.vite/
+web/dist/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# 数据文件（这些应该通过 volume 挂载）
+database.db
+database.db.backup
+*.db-journal
+storage/
+logs/
+downloads/
+backup_config/
+
+# 测试和临时文件
+test_*.py
+check_*.py
+demo.py
+diagnose_*.py
+explore_*.py
+*.log
+backend.log
+
+# 其他
+.env.local
+.env.*.local
+*.vbs

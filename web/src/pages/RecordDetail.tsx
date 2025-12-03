@@ -16,7 +16,7 @@ const RecordDetail: React.FC = () => {
     // 加载转写内容
     useEffect(() => {
         if (record?.transcript_path) {
-            fetch(`http://localhost:8000/${record.transcript_path}`)
+            fetch(`/${record.transcript_path}`)
                 .then(res => res.json())
                 .then(data => {
                     // 处理转写数据，合并成完整语句
@@ -85,7 +85,7 @@ const RecordDetail: React.FC = () => {
     const downloadVideo = () => {
         if (!record?.video_path) return;
         const link = document.createElement('a');
-        link.href = `http://localhost:8000/${record.video_path}`;
+        link.href = `/${record.video_path}`;
         link.download = `record_${record.id}.mp4`;
         link.click();
     };
@@ -140,7 +140,7 @@ const RecordDetail: React.FC = () => {
     if (isLoading) return <div className="p-8">加载中...</div>;
     if (!record) return <div className="p-8">记录未找到</div>;
 
-    const videoUrl = `http://localhost:8000/${record.video_path}`;
+    const videoUrl = `/${record.video_path}`;
 
     return (
         <div className="p-8 space-y-8">

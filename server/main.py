@@ -19,13 +19,23 @@ app = FastAPI(lifespan=lifespan)
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
+import os
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # Allow frontend origins
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "*"],  # Allow frontend origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount storage for local development
+# In Docker, Nginx handles this. But for local dev, we need FastAPI to serve it.
+if os.path.exists("../storage"):
+    app.mount("/storage", StaticFiles(directory="../storage"), name="storage")
+elif os.path.exists("storage"):
+    app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
 @app.post("/tasks/", response_model=Task)
 def create_task(task: TaskBase, session: Session = Depends(get_session)):

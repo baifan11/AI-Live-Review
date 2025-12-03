@@ -89,21 +89,76 @@ Lucide Icons     # 图标库
 
 ## 🚀 快速开始
 
-### 环境要求
+有两种方式启动项目：**Docker 部署（推荐）** 或 **本地开发部署**。
+
+### 🐳 方式一：Docker 部署（推荐）
+
+**最简单、最稳定的部署方式！**
+
+#### 环境要求
+
+- **Docker**: 20.10+
+- **Docker Compose**: 2.0+
+- **阿里云 DashScope API Key**（用于 AI 分析）
+
+#### 快速启动
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/baifan11/AI-Live-Review.git
+cd AI-Live-Review
+
+# 2. 配置环境变量
+echo "DASHSCOPE_API_KEY=your_api_key_here" > .env
+
+# 3. 一键启动（使用启动脚本）
+./docker-start.sh
+
+# 或者手动启动
+docker-compose up -d --build
+```
+
+#### 访问应用
+
+- **前端界面**: http://localhost
+- **后端 API**: http://localhost:8000
+- **API 文档**: http://localhost/tasks/
+
+#### 常用命令
+
+```bash
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+
+# 重启服务
+docker-compose restart
+```
+
+📖 **详细文档**: 查看 [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) 了解更多
+
+---
+
+### 💻 方式二：本地开发部署
+
+#### 环境要求
 
 - **Python**: 3.8+
 - **Node.js**: 16+
 - **FFmpeg**: 4.0+
 - **阿里云 DashScope API Key**（用于 AI 分析）
 
-### 1. 克隆项目
+#### 1. 克隆项目
 
 ```bash
 git clone https://github.com/baifan11/AI-Live-Review.git
 cd AI-Live-Review
 ```
 
-### 2. 后端设置
+#### 2. 后端设置
+
 
 ```bash
 # 创建虚拟环境
@@ -117,12 +172,11 @@ pip install -r requirements.txt
 # 配置环境变量
 echo "DASHSCOPE_API_KEY=your_api_key_here" > ../.env
 
-# 启动后端服务
-cd ..
-python -m uvicorn server.main:app --reload --host 0.0.0.0 --port 8000
+# 启动后端服务（注意：需要在 server 目录内启动）
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. 前端设置
+#### 3. 前端设置
 
 ```bash
 # 新开终端窗口
@@ -135,7 +189,7 @@ npm install
 npm run dev
 ```
 
-### 4. 访问应用
+#### 4. 访问应用
 
 - **前端**: http://localhost:5173
 - **后端 API**: http://localhost:8000

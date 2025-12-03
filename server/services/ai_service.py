@@ -42,8 +42,9 @@ class AIService:
         )
         
         try:
-            # Recognition.call supports local file path
-            response = recognition.call(audio_path)
+            # Run synchronous call in thread pool
+            import asyncio
+            response = await asyncio.to_thread(recognition.call, audio_path)
             
             if response.status_code == HTTPStatus.OK:
                 # The output format for Recognition is different from Transcription
@@ -67,24 +68,26 @@ class AIService:
         Analyze images using Qwen-VL-Plus.
         """
         results = []
-        # Qwen-VL-Plus can handle multiple images, but usually in a chat context.
-        # Or we can process them one by one or in batches.
-        # Let's process one by one for detailed description per frame.
+        import asyncio
         
         for img_path in image_paths:
             try:
-                response = dashscope.MultiModalConversation.call(
-                    model='qwen-vl-plus',
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": [
-                                {"image": f"file://{img_path}"},
-                                {"text": prompt}
-                            ]
-                        }
-                    ]
-                )
+                def _call_vl():
+                    return dashscope.MultiModalConversation.call(
+                        model='qwen-vl-plus',
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": [
+                                    {"image": f"file://{img_path}"},
+                                    {"text": prompt}
+                                ]
+                            }
+                        ]
+                    )
+                
+                # Run synchronous call in thread pool
+                response = await asyncio.to_thread(_call_vl)
                 
                 if response.status_code == HTTPStatus.OK:
                     content = response.output.choices[0].message.content
@@ -115,14 +118,19 @@ class AIService:
         请使用中文撰写分析报告，确保所有内容都是中文。
         """
 
-        response = dashscope.Generation.call(
-            model='qwen-max',
-            messages=[
-                {'role': 'system', 'content': 'You are a professional live stream analyst. 请确保所有分析和报告均使用中文输出。'},
-                {'role': 'user', 'content': full_prompt}
-            ],
-            result_format='message'
-        )
+        import asyncio
+        def _call_generation():
+            return dashscope.Generation.call(
+                model='qwen-max',
+                messages=[
+                    {'role': 'system', 'content': 'You are a professional live stream analyst. 请确保所有分析和报告均使用中文输出。'},
+                    {'role': 'user', 'content': full_prompt}
+                ],
+                result_format='message'
+            )
+
+        # Run synchronous call in thread pool
+        response = await asyncio.to_thread(_call_generation)
         
         if response.status_code == HTTPStatus.OK:
             return response.output.choices[0].message.content
