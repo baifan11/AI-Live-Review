@@ -46,11 +46,7 @@ RUN pip install --no-cache-dir -r server/requirements.txt
 
 # 复制后端代码
 COPY server/ ./server/
-COPY src/ ./src/
-COPY config/ ./config/
-COPY i18n/ ./i18n/
-COPY i18n.py ./
-COPY msg_push.py ./
+
 
 # 创建必要的目录
 RUN mkdir -p storage logs downloads backup_config

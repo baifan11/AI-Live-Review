@@ -12,13 +12,11 @@
 
 ### 1. 配置环境变量
 
-确保项目根目录有 `.env` 文件：
+虽然可以设置 `.env`，但推荐在启动后的 Web 界面 "Settings" 中配置 API Key。
 
 ```bash
-# 创建 .env 文件（如果不存在）
-cat > .env << EOF
-DASHSCOPE_API_KEY=your_dashscope_api_key_here
-EOF
+# 创建 .env 文件（可选）
+touch .env
 ```
 
 ### 2. 构建并启动服务
@@ -36,9 +34,9 @@ docker-compose logs -f backend
 
 ### 3. 访问应用
 
-- **前端界面**: http://localhost
-- **后端 API**: http://localhost/api/
-- **API 文档**: http://localhost/tasks/ (通过 Nginx 代理)
+- **前端界面**: http://localhost:8080
+- **后端 API**: http://localhost:8001
+- **API 文档**: http://localhost:8001/docs (或通过 Nginx http://localhost:8080/docs)
 
 ## 📦 Docker 架构
 
@@ -46,14 +44,14 @@ docker-compose logs -f backend
 
 ```
 ┌─────────────────────────────────────────┐
-│           Nginx (Port 80)               │
+│           Nginx (Port 80 -> 8080)       │
 │  - 前端静态文件服务                        │
 │  - API 反向代理                           │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│      FastAPI Backend (Port 8000)        │
+│      FastAPI Backend (Port 8000 -> 8001)│
 │  - 任务调度                               │
 │  - 直播录制                               │
 │  - AI 分析                                │
@@ -67,9 +65,7 @@ docker-compose logs -f backend
 - `./storage` - 录制视频文件
 - `./logs` - 应用日志
 - `./downloads` - 下载文件
-- `./database.db` - SQLite 数据库
-- `./config` - 配置文件
-- `./backup_config` - 备份配置
+- `./config` - 配置文件（包括数据库）
 
 ## 🛠️ 常用命令
 
@@ -126,12 +122,9 @@ docker-compose exec nginx sh
 
 ### 环境变量
 
-在 `.env` 文件中配置：
+在 `.env` 文件中配置（可选）：
 
 ```env
-# 必需配置
-DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
-
 # 可选配置
 TZ=Asia/Shanghai
 PYTHONUNBUFFERED=1
@@ -141,8 +134,8 @@ PYTHONUNBUFFERED=1
 
 默认端口映射：
 
-- `80:80` - Nginx (前端 + API 代理)
-- `8000:8000` - FastAPI 后端（可选，用于直接访问）
+- `8080:80` - Nginx (前端 + API 代理)
+- `8001:8000` - FastAPI 后端（直接访问）
 
 如需修改端口，编辑 `docker-compose.yml`：
 
@@ -150,7 +143,7 @@ PYTHONUNBUFFERED=1
 services:
   nginx:
     ports:
-      - "8080:80"  # 将前端映射到 8080 端口
+      - "80:80"  # 将前端映射回 80 端口
 ```
 
 ## 🐛 故障排除

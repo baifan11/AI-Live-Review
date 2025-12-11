@@ -108,8 +108,8 @@ Lucide Icons     # 图标库
 git clone https://github.com/baifan11/AI-Live-Review.git
 cd AI-Live-Review
 
-# 2. 配置环境变量
-echo "DASHSCOPE_API_KEY=your_api_key_here" > .env
+# 2. (可选) 配置环境变量
+# 注意：DashScope API Key 现已移至前端 "Settings" 页面配置，无需在 .env 中设置
 
 # 3. 一键启动（使用启动脚本）
 ./docker-start.sh
@@ -169,8 +169,8 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # 安装依赖
 pip install -r requirements.txt
 
-# 配置环境变量
-echo "DASHSCOPE_API_KEY=your_api_key_here" > ../.env
+# 配置环境变量 (可选，API Key 请在 Web 界面配置)
+# echo "DASHSCOPE_API_KEY=your_api_key_here" > ../.env
 
 # 启动后端服务（注意：需要在 server 目录内启动）
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
@@ -209,6 +209,7 @@ npm run dev
    - **间隔时长**: 每次录制的间隔（秒）
    - **录制时长**: 单次录制的时长（秒）
    - **录制段数**: 最大录制次数（0 为无限制）
+   - **定时启动**: 可选，设置任务自动开始的具体时间
    - **启用 AI 分析**: 是否进行 AI 分析
 3. 点击 **Create Task** 创建任务
 
@@ -272,8 +273,9 @@ AI-Live-Review/
 创建 `.env` 文件：
 
 ```env
-# 阿里云 DashScope API Key（必需，用于 AI 分析）
-DASHSCOPE_API_KEY=your_dashscope_api_key
+# DashScope API Key
+# 注意：生产环境中，请直接在网页端的 Settings 页面进行配置，此处仅作备用或开发调试
+# DASHSCOPE_API_KEY=your_dashscope_api_key
 
 # 前端 API 地址（可选，默认 http://localhost:5173）
 VITE_API_URL=http://localhost:8000
