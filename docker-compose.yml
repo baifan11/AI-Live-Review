@@ -1,4 +1,4 @@
-version: '3.8'
+                                                     version: '3.8'
 
 services:
   # ==================== 后端服务 ====================
@@ -16,7 +16,7 @@ services:
       - ./storage:/app/storage
       - ./logs:/app/logs
       - ./downloads:/app/downloads
-      - ./database.db:/app/database.db
+
       - ./config:/app/config
       - ./backup_config:/app/backup_config
     environment:

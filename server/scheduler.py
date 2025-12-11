@@ -35,18 +35,27 @@ async def recording_job(task_id: int):
         logger.info(f"Created record {record.id} for task {task_id}")
         
         try:
-            # 0. Load API Key from .env if AI enabled
+            # 0. Load API Key (DB Only)
             if task.ai_enabled:
                 logger.info(f"AI enabled for task {task_id}, loading API key")
-                from dotenv import load_dotenv
-                load_dotenv()
-                api_key = os.getenv('DASHSCOPE_API_KEY')
-                if api_key:
-                    AIService.set_api_key(api_key)
-                    logger.info("API key loaded successfully")
-                else:
-                    logger.warning("AI enabled but DASHSCOPE_API_KEY not found in .env")
-            
+                
+                from database import Settings
+                db_setting = session.get(Settings, "DASHSCOPE_API_KEY")
+                if not db_setting:
+                     # Fallback to lowercase key if uppercase not found
+                     db_setting = session.get(Settings, "dashscope_api_key")
+                
+                if not db_setting or not db_setting.value:
+                    error_msg = "DashScope API Key not configured. Please go to Settings to input your API Key."
+                    logger.error(error_msg)
+                    record.status = "failed"
+                    record.analysis_result = error_msg
+                    session.add(record)
+                    session.commit()
+                    return
+
+                AIService.set_api_key(db_setting.value)
+                logger.info("API key loaded successfully")
             
             # 1. Get Stream URL
             logger.info(f"[Task {task_id}] Step 1/5: Fetching stream URL for {task.url}")
@@ -171,9 +180,16 @@ def start_scheduler():
     logger.info("Scheduler started")
 
 def add_task_job(task: Task):
+    trigger_args = {"seconds": task.interval}
+    
+    # Handle Scheduled Start
+    if task.scheduled_start_time and task.scheduled_start_time > datetime.now():
+        trigger_args["start_date"] = task.scheduled_start_time
+        logger.info(f"Task {task.id} scheduled to start at {task.scheduled_start_time}")
+    
     scheduler.add_job(
         recording_job,
-        IntervalTrigger(seconds=task.interval),
+        IntervalTrigger(**trigger_args),
         id=str(task.id),
         args=[task.id],
         replace_existing=True

@@ -120,9 +120,9 @@ docker-compose up -d --build
 
 #### 访问应用
 
-- **前端界面**: http://localhost
-- **后端 API**: http://localhost:8000
-- **API 文档**: http://localhost/tasks/
+- **前端界面**: http://localhost:8080
+- **后端 API**: http://localhost:8001
+- **API 文档**: http://localhost:8001/docs
 
 #### 常用命令
 
@@ -231,7 +231,7 @@ npm run dev
 ### 系统设置
 
 在 **Settings** 页面配置：
-- **DashScope API Key**: 阿里云 AI 服务密钥(暂时不生效，APIkey配置在.env文件里)
+- **DashScope API Key**: 阿里云 AI 服务密钥
 - **提示词**
 ---
 

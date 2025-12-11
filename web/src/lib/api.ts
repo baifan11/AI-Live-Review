@@ -21,6 +21,7 @@ export interface Task {
     prompt_summary?: string;
     is_active: boolean;
     created_at?: string;
+    scheduled_start_time?: string;
 }
 
 export interface Record {
@@ -100,6 +101,17 @@ export const getSettingsBatch = async (keys: string[]): Promise<{ [key: string]:
     const response = await api.get(`/settings-batch/?keys=${keys.join(',')}`);
     return response.data;
 }
+
+
+export const saveApiKey = async (api_key: string) => {
+    const response = await api.put('/settings/apikey', { api_key });
+    return response.data;
+};
+
+export const getApiKey = async () => {
+    const response = await api.get<{ api_key: string }>('/settings/apikey');
+    return response.data;
+};
 
 export const updateSettingsBatch = async (settings: { [key: string]: string }) => {
     const response = await api.post('/settings-batch/', settings);

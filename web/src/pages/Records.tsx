@@ -34,10 +34,14 @@ const Records: React.FC = () => {
                     </thead>
                     <tbody className="divide-y">
                         {records?.map((record) => {
-                            // 计算该主播的记录序号
+                            // 计算该主播的记录序号 (时间越后，编号越大)
                             const anchorRecords = records?.filter(r => r.anchor_id === record.anchor_id) || [];
-                            const recordIndex = anchorRecords.findIndex(r => r.id === record.id) + 1;
-                            const recordNumber = String(recordIndex).padStart(2, '0');
+                            // records 是按时间倒序排列的 (Newest first)
+                            // Index 0 (Newest) should be #Total
+                            // Index Last (Oldest) should be #1
+                            const totalRecords = anchorRecords.length;
+                            const currentIndex = anchorRecords.findIndex(r => r.id === record.id);
+                            const recordNumber = String(totalRecords - currentIndex).padStart(2, '0');
 
                             return (
                                 <tr key={record.id} className="hover:bg-gray-50">

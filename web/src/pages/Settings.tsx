@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { updateSetting, getSettingsBatch, updateSettingsBatch } from '../lib/api';
+import { getSettingsBatch, updateSettingsBatch, getApiKey, saveApiKey } from '../lib/api';
 import { Save } from 'lucide-react';
 
 const Settings: React.FC = () => {
@@ -12,6 +12,7 @@ const Settings: React.FC = () => {
         prompt_summary: ''
     });
     const [message, setMessage] = useState('');
+    const [apiKeyMessage, setApiKeyMessage] = useState('');
 
     // 默认提示词
     const defaultPrompts = {
@@ -23,33 +24,42 @@ const Settings: React.FC = () => {
     // 批量获取所有设置
     const { data: settings, isLoading } = useQuery({
         queryKey: ['settings'],
-        queryFn: () => getSettingsBatch([
-            'dashscope_api_key',
-            'prompt_transcript',
-            'prompt_vision',
-            'prompt_summary'
-        ]),
+        queryFn: async () => {
+            const batch = await getSettingsBatch([
+                'prompt_transcript',
+                'prompt_vision',
+                'prompt_summary'
+            ]);
+            // 单独获取 API Key (包含掩码逻辑)
+            const keyData = await getApiKey();
+            return { ...batch, dashscope_api_key: keyData.api_key };
+        },
         retry: false
     });
 
     useEffect(() => {
         if (settings) {
-            setApiKey(settings.dashscope_api_key || '');
+            // 类型断言，确保访问属性不报错
+            const s = settings as any;
+            setApiKey(s.dashscope_api_key || '');
             setPrompts({
-                prompt_transcript: settings.prompt_transcript || defaultPrompts.prompt_transcript,
-                prompt_vision: settings.prompt_vision || defaultPrompts.prompt_vision,
-                prompt_summary: settings.prompt_summary || defaultPrompts.prompt_summary
+                prompt_transcript: s.prompt_transcript || defaultPrompts.prompt_transcript,
+                prompt_vision: s.prompt_vision || defaultPrompts.prompt_vision,
+                prompt_summary: s.prompt_summary || defaultPrompts.prompt_summary
             });
         }
     }, [settings]);
 
     const apiKeyMutation = useMutation({
-        mutationFn: (value: string) => updateSetting('dashscope_api_key', value),
+        mutationFn: (value: string) => saveApiKey(value),
         onSuccess: () => {
-            showMessage('API Key 保存成功！');
+            setApiKeyMessage('✅ API Key 验证并保存成功！');
+            setTimeout(() => setApiKeyMessage(''), 3000);
         },
-        onError: () => {
-            showMessage('保存失败，请重试。', 'error');
+        onError: (err: any) => {
+            const msg = err.response?.data?.detail || '保存失败，请检查 Key 是否有效。';
+            setApiKeyMessage(`❌ ${msg}`);
+            setTimeout(() => setApiKeyMessage(''), 5000);
         }
     });
 
@@ -111,7 +121,10 @@ const Settings: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex justify-end pt-2">
+                    <div className="flex justify-between items-center pt-2">
+                        <div className={`text-sm ${apiKeyMessage.includes('❌') ? 'text-red-600' : 'text-green-600'} font-medium`}>
+                            {apiKeyMessage}
+                        </div>
                         <button
                             type="submit"
                             disabled={apiKeyMutation.isPending}

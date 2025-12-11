@@ -46,9 +46,11 @@ const Dashboard: React.FC = () => {
                         <tbody className="divide-y">
                             {recentRecords.map((record) => {
                                 // 计算该主播的记录序号
+                                // 计算该主播的记录序号
                                 const anchorRecords = records?.filter(r => r.anchor_id === record.anchor_id) || [];
-                                const recordIndex = anchorRecords.findIndex(r => r.id === record.id) + 1;
-                                const recordNumber = String(recordIndex).padStart(2, '0');
+                                const totalRecords = anchorRecords.length;
+                                const currentIndex = anchorRecords.findIndex(r => r.id === record.id);
+                                const recordNumber = String(totalRecords - currentIndex).padStart(2, '0');
 
                                 return (
                                     <tr key={record.id} className="hover:bg-gray-50">

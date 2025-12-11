@@ -79,6 +79,11 @@ const Tasks: React.FC = () => {
                             <div className="font-medium">{task.anchor_name || task.url}</div>
                             <div className="text-sm text-gray-500">
                                 主播ID: {task.anchor_id || 'N/A'} | 间隔: {task.interval}s | 时长: {task.duration}s | 段数: {task.max_recordings || '∞'} | AI: {task.ai_enabled ? '开启' : '关闭'}
+                                {task.scheduled_start_time && (
+                                    <span className="ml-2 text-blue-600">
+                                        | 定时启动: {new Date(task.scheduled_start_time).toLocaleString()}
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -185,6 +190,17 @@ const Tasks: React.FC = () => {
                                     />
                                 </div>
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">定时开始时间 (可选)</label>
+                                <input
+                                    type="datetime-local"
+                                    value={newTask.scheduled_start_time || ''}
+                                    onChange={e => setNewTask({ ...newTask, scheduled_start_time: e.target.value })}
+                                    className="w-full p-2 border rounded"
+                                    step="1"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">留空则立即开始。精确到秒。</p>
+                            </div>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
@@ -210,9 +226,9 @@ const Tasks: React.FC = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div >
             )}
-        </div>
+        </div >
     );
 };
 

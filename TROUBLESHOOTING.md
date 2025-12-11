@@ -102,6 +102,16 @@ python demo.py
 2. 检查前端是否有请求超时设置
 3. 考虑将录制改为完全后台任务
 
+#### 问题 D: FFmpeg 抽帧失败 (mjpeg non-standard YUV)
+**错误信息**:
+`[mjpeg @ ...] Non full-range YUV is non-standard, set strict_std_compliance to at most unofficial to use it.`
+
+**原因**:
+某些直播流（如抖音）使用 TV Range (Limited Range) 的 YUV 格式，默认的 FFmpeg mjpeg 编码器认为将此转换为 JPEG 是非标准的。
+
+**解决方法**:
+在 FFmpeg 命令中添加 `-strict unofficial` 参数。项目代码已修复此问题（`server/services/media_processor.py`），如果自行构建 FFmpeg 命令请注意此参数。
+
 ### 5. **进一步优化建议**
 
 如果问题仍然存在，可以考虑：

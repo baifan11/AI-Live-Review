@@ -19,6 +19,25 @@ class AIService:
         dashscope.api_key = api_key
 
     @staticmethod
+    async def verify_api_key(api_key: str) -> bool:
+        """
+        Verify if the given API Key is valid by making a simple request.
+        """
+        dashscope.api_key = api_key
+        try:
+            # Simple call to list models or similar lightweight call
+            # Using Qwen-turbo for a quick test generation
+            response = dashscope.Generation.call(
+                model='qwen-turbo',
+                messages=[{'role': 'user', 'content': 'hi'}],
+                result_format='message'
+            )
+            return response.status_code == HTTPStatus.OK
+        except Exception as e:
+            logger.error(f"API Key verification failed: {e}")
+            return False
+
+    @staticmethod
     async def transcribe_audio(audio_path: str) -> str:
         """
         Transcribe audio using DashScope Recognition (paraformer-realtime-v1).

@@ -22,6 +22,7 @@ class TaskBase(SQLModel):
     # Status
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.now)
+    scheduled_start_time: Optional[datetime] = None  # Scheduled start time
 
 class Task(TaskBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -58,7 +59,7 @@ class Settings(SQLModel, table=True):
     value: str
 
 # Database Setup
-sqlite_file_name = "database.db"
+sqlite_file_name = "config/database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 engine = create_engine(sqlite_url)

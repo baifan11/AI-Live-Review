@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from typing import Optional
 from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 from database import create_db_and_tables, get_session, Task, TaskBase, Record, Settings, engine
@@ -32,10 +33,10 @@ app.add_middleware(
 
 # Mount storage for local development
 # In Docker, Nginx handles this. But for local dev, we need FastAPI to serve it.
-if os.path.exists("../storage"):
-    app.mount("/storage", StaticFiles(directory="../storage"), name="storage")
-elif os.path.exists("storage"):
+if os.path.exists("storage"):
     app.mount("/storage", StaticFiles(directory="storage"), name="storage")
+elif os.path.exists("../storage"):
+    app.mount("/storage", StaticFiles(directory="../storage"), name="storage")
 
 @app.post("/tasks/", response_model=Task)
 def create_task(task: TaskBase, session: Session = Depends(get_session)):
@@ -150,8 +151,17 @@ def stop_task(task_id: int, session: Session = Depends(get_session)):
     return pause_task(task_id, session)
 
 @app.get("/records/", response_model=list[Record])
-def read_records(session: Session = Depends(get_session)):
-    records = session.exec(select(Record).order_by(Record.start_time.desc())).all()
+def read_records(task_id: Optional[int] = None, sort: str = "desc", session: Session = Depends(get_session)):
+    query = select(Record)
+    if task_id:
+        query = query.where(Record.task_id == task_id)
+    
+    if sort == "asc":
+        query = query.order_by(Record.start_time.asc())
+    else:
+        query = query.order_by(Record.start_time.desc())
+        
+    records = session.exec(query).all()
     return records
 
 @app.get("/records/{record_id}", response_model=Record)
@@ -223,12 +233,52 @@ def update_settings_batch(settings: dict, session: Session = Depends(get_session
         updated.append(key)
     session.commit()
     return {"updated": updated, "count": len(updated)}
+from typing import Optional
+from pydantic import BaseModel
+from services.ai_service import AIService
 
-from fastapi.staticfiles import StaticFiles
-import os
+class APIKeyRequest(BaseModel):
+    api_key: str
 
-# Mount storage directory
-os.makedirs("storage", exist_ok=True)
-app.mount("/storage", StaticFiles(directory="storage"), name="storage")
+@app.get("/settings/apikey")
+def get_api_key(session: Session = Depends(get_session)):
+    """Get masked API Key"""
+    setting = session.get(Settings, "DASHSCOPE_API_KEY")
+    task_setting = session.get(Settings, "dashscope_api_key") # Check legacy or lowercase
+    
+    val = None
+    if setting: val = setting.value
+    elif task_setting: val = task_setting.value
+    
+    if not val:
+        return {"api_key": ""}
+    
+    if len(val) > 8:
+        masked = val[:4] + "****" + val[-4:]
+    else:
+        masked = "****"
+        
+    return {"api_key": masked}
+
+@app.put("/settings/apikey")
+async def save_api_key(request: APIKeyRequest, session: Session = Depends(get_session)):
+    """Verify and save API Key"""
+    is_valid = await AIService.verify_api_key(request.api_key)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid API Key")
+        
+    # Save to database
+    db_setting = session.get(Settings, "DASHSCOPE_API_KEY")
+    if db_setting:
+        db_setting.value = request.api_key
+        session.add(db_setting)
+    else:
+        new_setting = Settings(key="DASHSCOPE_API_KEY", value=request.api_key)
+        session.add(new_setting)
+        
+    session.commit()
+    return {"ok": True, "message": "API Key saved"}
+
+
 
 

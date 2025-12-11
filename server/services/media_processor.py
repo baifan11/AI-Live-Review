@@ -51,6 +51,8 @@ class MediaProcessor:
             "ffmpeg", "-y",
             "-i", video_path,
             "-vf", f"fps=1/{interval}",
+            "-q:v", "2",
+            "-strict", "unofficial",
             f"{output_dir}/frame_%04d.jpg"
         ]
         
